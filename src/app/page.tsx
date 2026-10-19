@@ -19,6 +19,9 @@ type Plan = {
   popular?: boolean;
 };
 
+const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61595593498742";
+const INSTAGRAM_URL = "https://www.instagram.com/the_scholars_desk_12?psln=Y3BjaXE1aHJhOGo4";
+
 const services: Service[] = [
   {
     slug: "dissertation",
@@ -128,24 +131,93 @@ const benefits = [
   },
 ];
 
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M13.5 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.3V13h2.8v8h3.4Z" />
+    </svg>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect
+        x="3"
+        y="3"
+        width="18"
+        height="18"
+        rx="5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <circle
+        cx="12"
+        cy="12"
+        r="4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <circle cx="17.5" cy="6.8" r="1.2" />
+    </svg>
+  );
+}
+
+function SocialLinks({
+  location,
+}: {
+  location: "navbar" | "footer";
+}) {
+  return (
+    <div
+      className={`social-links social-links-${location}`}
+      aria-label="Social media links"
+    >
+      <a
+        href={FACEBOOK_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Visit our Facebook page"
+        title="Facebook"
+      >
+        <FacebookIcon />
+        {location === "footer" && <span>Facebook</span>}
+      </a>
+
+      <a
+        href={INSTAGRAM_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Visit our Instagram profile"
+        title="Instagram"
+      >
+        <InstagramIcon />
+        {location === "footer" && <span>Instagram</span>}
+      </a>
+    </div>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
       <header className="site-header">
         <Link href="/" className="brand">
-  <Image
-    src="/images/logo.png"
-    alt="The Scholar's Desk Logo"
-    width={220}
-    height={80}
-    priority
-    className="brand-logo"
-  />
-  <span className="brand-text">
-    <strong>The Scholar&apos;s Desk</strong>
-    <small>ACADEMIC SUPPORT &amp; GUIDANCE</small>
-  </span>
-</Link>
+          <Image
+            src="/images/logo.png"
+            alt="The Scholar's Desk Logo"
+            width={220}
+            height={80}
+            priority
+            className="brand-logo"
+          />
+          <span className="brand-text">
+            <strong>The Scholar&apos;s Desk</strong>
+            <small>ACADEMIC SUPPORT &amp; GUIDANCE</small>
+          </span>
+        </Link>
 
         <nav className="main-nav" aria-label="Main navigation">
           <Link href="/">Home</Link>
@@ -154,9 +226,12 @@ export default function HomePage() {
           <Link href="#about">About</Link>
         </nav>
 
-        <Link href="/contact" className="nav-button">
-          Get Started <span>↗</span>
-        </Link>
+        <div className="header-actions">
+          <SocialLinks location="navbar" />
+          <Link href="/contact" className="nav-button">
+            Get Started <span>↗</span>
+          </Link>
+        </div>
       </header>
 
       <main>
@@ -192,9 +267,7 @@ export default function HomePage() {
 
             <div className="hero-note">
               <span>✦</span>
-              <p>
-                Build confidence in your own academic work.
-              </p>
+              <p>Build confidence in your own academic work.</p>
             </div>
           </div>
 
@@ -208,7 +281,6 @@ export default function HomePage() {
               <span>THE SCHOLAR&apos;S DESK</span>
               <strong>Where ideas take shape.</strong>
             </div>
-            
           </div>
         </section>
 
@@ -241,6 +313,7 @@ export default function HomePage() {
                 research, writing and editing needs.
               </p>
             </div>
+
             <Link href="/contact" className="view-all">
               Discuss Your Needs <span>→</span>
             </Link>
@@ -254,10 +327,7 @@ export default function HomePage() {
                 key={service.slug}
               >
                 <div className="service-image">
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                  />
+                  <img src={service.image} alt={service.title} />
                   <span className="service-badge">
                     {service.badge}
                   </span>
@@ -408,6 +478,7 @@ export default function HomePage() {
                 the challenges you are facing.
               </p>
             </article>
+
             <article className="process-card">
               <span>02</span>
               <h3>Choose Your Support</h3>
@@ -416,6 +487,7 @@ export default function HomePage() {
                 price before placing your order.
               </p>
             </article>
+
             <article className="process-card">
               <span>03</span>
               <h3>Move Forward</h3>
@@ -451,23 +523,28 @@ export default function HomePage() {
         <div className="footer-main">
           <div className="footer-brand">
             <Link href="/" className="brand">
-  <Image
-    src="/images/logo.png"
-    alt="The Scholar's Desk Logo"
-    width={220}
-    height={80}
-    priority
-    className="brand-logo"
-  />
-  <span className="brand-text">
-    <strong>The Scholar&apos;s Desk</strong>
-    <small>ACADEMIC SUPPORT &amp; GUIDANCE</small>
-  </span>
-</Link>
+              <Image
+                src="/images/logo.png"
+                alt="The Scholar's Desk Logo"
+                width={220}
+                height={80}
+                className="brand-logo"
+              />
+              <span className="brand-text">
+                <strong>The Scholar&apos;s Desk</strong>
+                <small>ACADEMIC SUPPORT &amp; GUIDANCE</small>
+              </span>
+            </Link>
+
             <p>
               Thoughtful guidance for clearer writing,
               stronger research and confident learning.
             </p>
+
+            <div className="footer-social">
+              <h3>Connect With Us</h3>
+              <SocialLinks location="footer" />
+            </div>
           </div>
 
           <div className="footer-column">
