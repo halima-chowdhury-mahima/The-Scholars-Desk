@@ -208,13 +208,7 @@ export default function HomePage() {
               <span>THE SCHOLAR&apos;S DESK</span>
               <strong>Where ideas take shape.</strong>
             </div>
-            <div className="floating-card">
-              <span className="floating-icon">✧</span>
-              <div>
-                <strong>Your goals. Your progress.</strong>
-                <p>Guidance for every stage.</p>
-              </div>
-            </div>
+            
           </div>
         </section>
 
