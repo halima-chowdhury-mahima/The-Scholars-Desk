@@ -1,156 +1,180 @@
 
 "use client";
-import Image from "next/image";
+
+import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
 
-function ContactForm() {
-  const searchParams = useSearchParams();
-  const selectedPlan = searchParams.get("plan") ?? "";
-  const selectedService = searchParams.get("service") ?? "";
-
+export default function ContactPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [project, setProject] = useState(
-    selectedService || selectedPlan
-      ? `Interested in: ${selectedService || selectedPlan}`
-      : ""
-  );
+  const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState("");
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+
+    setStatus("");
+    setError(false);
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          subject,
+          message,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message || "Unable to send your enquiry. Please try again."
+        );
+      }
+
+      setStatus(result.message);
+      setName("");
+      setEmail("");
+      setSubject("");
+      setMessage("");
+    } catch (err) {
+      setError(true);
+      setStatus(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <main className="contact-page">
-      <Link href="/" className="brand">
-  <Image
-    src="/images/logo.png"
-    alt="The Scholar's Desk Logo"
-    width={70}
-    height={70}
-    className="brand-logo"
-    priority
-  />
+      <div className="contact-container">
+        <Link href="/" className="contact-back">
+          ← Return to homepage
+        </Link>
 
-  <div className="brand-text">
-    <h1>The Scholar&apos;s Desk</h1>
-    <p>ACADEMIC SUPPORT &amp; GUIDANCE</p>
-  </div>
-</Link>
+        <section className="contact-card">
+          <p className="contact-eyebrow">LET&apos;S TALK</p>
 
-      <section className="contact-panel">
-        <div className="contact-intro">
-          <p className="eyebrow">LET&apos;S TALK</p>
           <h1>Tell us about your project.</h1>
-          <p>
-            Share your requirements and the support you are
-            looking for. We&apos;ll help you understand the next steps.
+
+          <p className="contact-intro">
+            Share your requirements and the support you are looking
+            for. We&apos;ll help you understand the next steps.
           </p>
-        </div>
-        
 
-        {submitted ? (
-          <div className="form-success" role="status">
-            <h2>Thank you, {name}.</h2>
-            <p>
-              Your form has been completed in this demo.
-              No message has been sent yet. Connect a backend
-              or email service to receive real enquiries.
-            </p>
-            <button
-              type="button"
-              className="button-navy"
-              onClick={() => setSubmitted(false)}
-            >
-              Edit Your Details
-            </button>
-          </div>
-        ) : (
           <form className="contact-form" onSubmit={handleSubmit}>
-            <label htmlFor="name">Full name</label>
-            <input
-              id="name"
-              name="name"
-              autoComplete="name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="Your full name"
-              required
-            />
+            <div className="contact-field">
+              <label htmlFor="name">Full name *</label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="Enter your full name"
+                maxLength={150}
+                required
+              />
+            </div>
 
-            <label htmlFor="email">Email address</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@example.com"
-              required
-            />
+            <div className="contact-field">
+              <label htmlFor="email">Email address *</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@example.com"
+                maxLength={254}
+                required
+              />
+            </div>
 
-            <label htmlFor="project">Service or plan</label>
-            <select
-              id="project"
-              name="project"
-              value={project}
-              onChange={(event) => setProject(event.target.value)}
-              required
+            <div className="contact-field">
+              <label htmlFor="subject">What do you need help with?</label>
+              <select
+                id="subject"
+                name="subject"
+                value={subject}
+                onChange={(event) => setSubject(event.target.value)}
+              >
+                <option value="">Choose a service</option>
+                <option value="Dissertation Support">
+                  Dissertation Support
+                </option>
+                <option value="Thesis Guidance">Thesis Guidance</option>
+                <option value="Assignment Support">
+                  Assignment Support
+                </option>
+                <option value="Research Support">Research Support</option>
+                <option value="Editing & Proofreading">
+                  Editing &amp; Proofreading
+                </option>
+                <option value="Referencing & Formatting">
+                  Referencing &amp; Formatting
+                </option>
+                <option value="Other Enquiry">Other Enquiry</option>
+              </select>
+            </div>
+
+            <div className="contact-field">
+              <label htmlFor="message">Tell us about your project *</label>
+              <textarea
+                id="message"
+                name="message"
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+                placeholder="Share your requirements, deadline and questions..."
+                rows={6}
+                maxLength={10000}
+                required
+              />
+            </div>
+
+            {status && (
+              <div
+                className={`contact-status ${
+                  error ? "contact-status-error" : "contact-status-success"
+                }`}
+                role="status"
+                aria-live="polite"
+              >
+                {status}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="contact-submit"
+              disabled={loading}
             >
-              <option value="">Select a service or plan</option>
-              <option value="dissertation">Dissertation Support</option>
-              <option value="thesis">Thesis Guidance</option>
-              <option value="assignment">Assignment Support</option>
-              <option value="research">Research Support</option>
-              <option value="editing">Editing & Proofreading</option>
-              <option value="referencing">Referencing & Formatting</option>
-              <option value="basic">Basic Plan</option>
-              <option value="standard">Standard Plan</option>
-              <option value="premium">Premium Plan</option>
-            </select>
-
-            <label htmlFor="message">Project details</label>
-            <textarea
-              id="message"
-              name="message"
-              rows={5}
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
-              placeholder="Tell us about your requirements..."
-              required
-            />
-
-            <button type="submit" className="button-gold">
-              Submit Enquiry <span>→</span>
+              {loading ? "Sending enquiry..." : "Send Your Enquiry"}
+              {!loading && <span>↗</span>}
             </button>
 
-            <p className="form-disclaimer">
-              Please do not include passwords, student ID numbers
-              or other sensitive personal information.
+            <p className="contact-privacy">
+              Your details will be used to respond to your enquiry.
             </p>
           </form>
-
-          
-        )}
-      </section>
-
-      <Link href="/" className="contact-back">
-        ← Return to homepage
-      </Link>
+        </section>
+      </div>
     </main>
-  );
-}
-
-export default function ContactPage() {
-  return (
-    <Suspense fallback={<main className="contact-page">Loading...</main>}>
-      <ContactForm />
-    </Suspense>
   );
 }
